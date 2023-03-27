@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit entry</title>
+  </head>
+  <body>
+    <h1>Edit entry</h1>
+    <form method="post">
+      <label for="title">Title:</label><br />
+      <input
+        type="text"
+        id="title"
+        name="title"
+        value="{{ todo.title }}"
+      /><br />
+      <label for="description">Description:</label><br />
+      <textarea id="description" name="description">
+{{ todo.description }}</textarea
+      ><br />
+      <input type="submit" value="Save" />
+    </form>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Todo App</title>
+  </head>
+  <body>
+    <h1>Todo App</h1>
+    <ul>
+      {% for todo in todos %}
+      <li>
+        <h2>{{ todo.title }}</h2>
+        <p>{{ todo.description }}</p>
+        <a href="/edit/{{ todo.id }}">Edit</a>
+        <a href="/delete/{{ todo.id }}">Delete</a>
+      </li>
+      {% endfor %}
+    </ul>
+    <a href="/create">Create new entry</a>
+  </body>
+</html>
+
+
+
+
