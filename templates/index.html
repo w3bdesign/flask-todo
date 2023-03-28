@@ -4,21 +4,17 @@
     <title>Todo App</title>
   </head>
   <body>
-    <h1>Todo App</h1>
+    <h1>Todo List</h1>
     <ul>
       {% for todo in todos %}
       <li>
-        <h2>{{ todo.title }}</h2>
+        <h3>{{ todo.title }}</h3>
         <p>{{ todo.description }}</p>
         <a href="/edit/{{ todo.id }}">Edit</a>
         <a href="/delete/{{ todo.id }}">Delete</a>
       </li>
       {% endfor %}
     </ul>
-    <a href="/create">Create new entry</a>
+    <a href="/create">Create New Todo</a>
   </body>
 </html>
-
-
-
-

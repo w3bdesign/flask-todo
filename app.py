@@ -1,12 +1,16 @@
-from flask import Flask, render_template, request, redirect, make_response
-import json
+from flask import Flask, redirect, render_template, request, jsonify, url_for
+import requests
 
 app = Flask(__name__)
+
+todos = []
 
 
 @app.route("/")
 def index():
-    todos = get_todos()
+    # Retrieve the todos from the /todos API endpoint
+    response = requests.get("http://localhost:5000/todos")
+    todos = response.json()["todos"]
     return render_template("index.html", todos=todos)
 
 
@@ -15,9 +19,9 @@ def create():
     if request.method == "POST":
         title = request.form["title"]
         description = request.form["description"]
-        return create_todo(
-            {"id": generate_id(), "title": title, "description": description}
-        )
+        todo = {"id": generate_id(), "title": title, "description": description}
+        create_todo(todo)
+        return redirect(url_for("index"))
     return render_template("create.html")
 
 
@@ -28,64 +32,57 @@ def edit(id):
         title = request.form["title"]
         description = request.form["description"]
         update_todo_by_id(id, {"title": title, "description": description})
-        return redirect("/")
+        #return jsonify({"message": "Todo updated successfully."})
+        return redirect(url_for("index"))
     return render_template("edit.html", todo=todo)
 
 
 @app.route("/delete/<int:id>")
 def delete(id):
     delete_todo_by_id(id)
-    return redirect("/")
+    #return jsonify({"message": "Todo deleted successfully."})
+    return redirect(url_for("index"))
 
 
-def get_todos():
-    todos = json.loads(request.cookies.get("todos", "[]"))
-    # If there are no todos in the cookie, check local storage
-    if not todos:
-        todos = json.loads(request.args.get("todos", "[]"))
-    return todos
+@app.route("/todos")
+def get_all_todos():
+    return jsonify({"todos": todos})
+
+
+@app.route("/todos/<int:id>")
+def get_todo_by_id(id):
+    todo = None
+    for t in todos:
+        if t["id"] == id:
+            todo = t
+            break
+    if todo:
+        return jsonify({"todo": todo})
+    else:
+        return jsonify({"error": "Todo not found."}), 404
 
 
 def generate_id():
-    todos = get_todos()
     if not todos:
         return 1
     return max([todo["id"] for todo in todos]) + 1
 
 
 def create_todo(todo):
-    todos = get_todos()
     todos.append(todo)
-    response = make_response(redirect("/"))
-    response.set_cookie("todos", json.dumps(todos), samesite="None", secure=True)
-    return response
-
-
-def get_todo_by_id(id):
-    todos = get_todos()
-    for todo in todos:
-        if todo["id"] == id:
-            return todo
-    return None
 
 
 def update_todo_by_id(id, new_todo):
-    todos = get_todos()
     for i in range(len(todos)):
         if todos[i]["id"] == id:
-            todos[i] = new_todo
-            response = make_response(redirect("/"))
-            response.set_cookie("todos", json.dumps(todos))
-            return response
-    return None
+            todos[i] = {**todos[i], **new_todo}
+            return
+    raise Exception("Todo not found.")
 
 
 def delete_todo_by_id(id):
-    todos = get_todos()
     for i in range(len(todos)):
         if todos[i]["id"] == id:
             del todos[i]
-            response = make_response(redirect("/"))
-            response.set_cookie("todos", json.dumps(todos))
-            return response
-    return None
+            return
+    raise Exception("Todo not found.")
