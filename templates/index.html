@@ -11,7 +11,7 @@
   <body class="flex flex-col h-full justify-center items-center bg-gray-100">
     <section class="text-gray-600 body-font flex-grow">
       <div class="container mx-auto px-5 py-10 sm:py-24">
-        <h1 class="text-3xl font-bold mb-10">Todo List</h1>
+        <h1 class="text-3xl font-bold mb-10 text-center">Todo List</h1>
 
         <ul class="space-y-5">
           {% for todo in todos %}
@@ -34,9 +34,12 @@
           {% endfor %}
         </ul>
 
-        <a href="/create" class="text-blue-500 mt-4 hover:text-blue-600"
-          >Create New Todo</a
+        <a
+          href="/create"
+          class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
+          Create New Todo
+        </a>
       </div>
     </section>
   </body>
