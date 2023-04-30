@@ -13,5 +13,5 @@ packaging==23.1
 pathspec==0.11.1
 platformdirs==3.5.0
 requests==2.29.0
-urllib3==2.0.0
+urllib3==2.0.1
 Werkzeug==2.3.2
