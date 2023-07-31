@@ -86,3 +86,6 @@ def delete_todo_by_id(id):
             del todos[i]
             return
     raise Exception("Todo not found.")
+
+if __name__ == "__main__":
+    app.run(debug=False)
