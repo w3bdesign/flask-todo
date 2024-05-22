@@ -12,6 +12,6 @@ mypy-extensions==1.0.0
 packaging==24.0
 pathspec==0.12.1
 platformdirs==4.2.0
-requests==2.31.0
+requests==2.32.2
 urllib3==2.2.1
 Werkzeug==3.0.3
