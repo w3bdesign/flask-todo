@@ -14,4 +14,4 @@ pathspec==0.12.1
 platformdirs==4.2.2
 requests==2.32.3
 urllib3==2.2.2
-Werkzeug==3.0.3
+Werkzeug==3.0.4
