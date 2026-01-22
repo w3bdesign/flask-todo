@@ -21,12 +21,14 @@ class TodoCreate(BaseModel):
     """Model for creating a new todo item (no ID - server generates it)."""
     title: str
     description: str = ""
+    completed: bool = False  # NEW: Track if todo is done
 
 
 class TodoUpdate(BaseModel):
     """Model for updating a todo item (all fields optional)."""
     title: Optional[str] = None
     description: Optional[str] = None
+    completed: Optional[bool] = None  # NEW: Can update completed status
 
 
 class Todo(BaseModel):
@@ -34,3 +36,4 @@ class Todo(BaseModel):
     id: int
     title: str
     description: str = ""
+    completed: bool = False  # NEW: Default to not completed
