@@ -15,20 +15,36 @@
 
         <ul class="space-y-5">
           {% for todo in todos %}
-          <li class="border-b pb-2">
-            <h3 class="text-lg font-bold">{{ todo.title }}</h3>
-            <p class="text-sm">{{ todo.description }}</p>
-            <div class="mt-2">
-              <a
-                href="/edit/{{ todo.id }}"
-                class="text-blue-500 mr-2 hover:text-blue-600"
-                >Edit</a
-              >
-              <a
-                href="/delete/{{ todo.id }}"
-                class="text-red-500 hover:text-red-600"
-                >Delete</a
-              >
+          <li class="border-b pb-2 flex items-start gap-3">
+            <!-- Checkbox to toggle completed status -->
+            <a href="/toggle/{{ todo.id }}" class="mt-1" title="Click to toggle completed">
+              {% if todo.completed %}
+              <span class="inline-block w-5 h-5 rounded border-2 border-green-500 bg-green-500 text-white text-center leading-5 text-sm">✓</span>
+              {% else %}
+              <span class="inline-block w-5 h-5 rounded border-2 border-gray-300 bg-white"></span>
+              {% endif %}
+            </a>
+            
+            <div class="flex-grow">
+              <!-- Apply strikethrough and fade if completed -->
+              <h3 class="text-lg font-bold {% if todo.completed %}line-through text-gray-400{% endif %}">
+                {{ todo.title }}
+              </h3>
+              <p class="text-sm {% if todo.completed %}line-through text-gray-400{% endif %}">
+                {{ todo.description }}
+              </p>
+              <div class="mt-2">
+                <a
+                  href="/edit/{{ todo.id }}"
+                  class="text-blue-500 mr-2 hover:text-blue-600"
+                  >Edit</a
+                >
+                <a
+                  href="/delete/{{ todo.id }}"
+                  class="text-red-500 hover:text-red-600"
+                  >Delete</a
+                >
+              </div>
             </div>
           </li>
           {% endfor %}
