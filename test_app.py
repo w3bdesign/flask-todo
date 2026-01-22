@@ -14,8 +14,6 @@ class AppTestCase(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        #self.assertIn(b"Test Todo", response.data)
-        #self.assertIn(b"This is a test todo", response.data)
 
     def tearDown(self):
         todos.clear()
