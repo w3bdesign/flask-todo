@@ -12,7 +12,7 @@ Then visit:
     http://localhost:8000/redoc  - ReDoc API documentation
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -59,12 +59,58 @@ def find_todo_by_id(todo_id: int) -> dict | None:
 
 
 # =============================================================================
-# Routes will be added in Phase 2 (API) and Phase 3 (Web Interface)
+# Phase 2: API Routes (JSON endpoints)
 # =============================================================================
 
-
-# For now, just a simple health check to verify the app is running
 @app.get("/health")
 async def health_check():
     """Health check endpoint to verify the app is running."""
     return {"status": "healthy", "message": "FastAPI Todo App is running!"}
+
+
+@app.get("/todos")
+async def get_all_todos():
+    """
+    Get all todos.
+    
+    Flask equivalent:
+        @app.route("/todos")
+        def get_all_todos():
+            return jsonify({"todos": todos})
+    
+    FastAPI differences:
+        - Uses @app.get() instead of @app.route()
+        - Returns dict directly (auto-converted to JSON)
+        - async function (optional but recommended)
+    """
+    return {"todos": todos}
+
+
+@app.get("/todos/{todo_id}")
+async def get_todo_by_id(todo_id: int):
+    """
+    Get a single todo by ID.
+    
+    Flask equivalent:
+        @app.route("/todos/<int:id>")
+        def get_todo_by_id(id):
+            todo = find_todo_by_id(id)
+            if todo:
+                return jsonify({"todo": todo})
+            else:
+                return jsonify({"error": "Todo not found."}), 404
+    
+    FastAPI differences:
+        - Path parameter: {todo_id} instead of <int:id>
+        - Type hint: todo_id: int (automatic validation)
+        - HTTPException instead of returning tuple with status code
+    """
+    todo = find_todo_by_id(todo_id)
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    return {"todo": todo}
+
+
+# =============================================================================
+# Phase 3: Web Interface Routes (HTML pages) - Coming next
+# =============================================================================
