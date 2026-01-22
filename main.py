@@ -132,8 +132,8 @@ async def index(request: Request):
 async def create_form(request: Request):
     """Show the create todo form."""
     return templates.TemplateResponse(
-        "create.html",
-        {"request": request}
+        request,
+        "create.html"
     )
 
 
@@ -166,8 +166,9 @@ async def edit_form(request: Request, todo_id: int):
     
     # Convert to dict for template
     return templates.TemplateResponse(
+        request,
         "edit.html",
-        {"request": request, "todo": todo.model_dump()}
+        {"todo": todo.model_dump()}
     )
 
 
