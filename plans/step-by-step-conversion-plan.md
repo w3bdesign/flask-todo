@@ -327,7 +327,95 @@ return templates.TemplateResponse("index.html", {"request": request, "todos": to
 | 2 | `/todos` returns JSON | API endpoints only |
 | 3 | `/` shows HTML | Full web interface |
 | 4 | CSS loads correctly | Complete styling |
-| 5 | All features work | Production ready |
+| 5 | Tests pass | Automated validation |
+| 6 | All features work | Complete application |
+
+---
+
+## Production Considerations
+
+This conversion is designed for **learning purposes**. Here's what would be needed for a production-ready app:
+
+### What This App Has - Learning Level
+- ✅ Basic CRUD operations
+- ✅ Web interface with forms
+- ✅ API endpoints with JSON
+- ✅ Automatic API documentation
+- ✅ Type validation with Pydantic
+- ✅ Basic unit tests
+
+### What Production Would Need - Future Learning
+
+| Category | Current | Production Requirement |
+|----------|---------|----------------------|
+| **Data Storage** | In-memory list - lost on restart | Database such as PostgreSQL or SQLite with SQLAlchemy |
+| **Authentication** | None | JWT tokens, OAuth, session management |
+| **Configuration** | Hardcoded values | Environment variables, .env files |
+| **Error Handling** | Basic exceptions | Logging, error tracking with Sentry |
+| **Security** | None | HTTPS, CORS, rate limiting, CSRF |
+| **Deployment** | Local dev server | Docker, Gunicorn, cloud hosting |
+| **Monitoring** | None | Health checks, metrics, alerts |
+
+### Learning Path After This Tutorial
+
+```mermaid
+flowchart TD
+    A[This Tutorial: Flask to FastAPI] --> B[Add SQLite Database]
+    B --> C[Add User Authentication]
+    C --> D[Add Environment Config]
+    D --> E[Dockerize Application]
+    E --> F[Deploy to Cloud]
+```
+
+### Example: Adding a Database - Future Step
+```python
+# This would be a natural next step after completing this tutorial
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+DATABASE_URL = "sqlite:///./todos.db"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Dependency injection for database sessions
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+```
+
+---
+
+## Summary
+
+### Updated Phase Overview
+
+| Phase | Focus | Documentation |
+|-------|-------|---------------|
+| 1 | Foundation - models and setup | `step-1-foundation.md` |
+| 2 | API Routes - JSON endpoints | `step-2-api-routes.md` |
+| 3 | Web Routes - HTML pages | `step-3-web-routes.md` |
+| 4 | Templates - url_for changes | `step-4-templates.md` |
+| 5 | Testing - pytest and TestClient | `step-5-testing.md` |
+| 6 | Final verification and cleanup | `step-6-final.md` |
+
+### Files We Will Create or Modify
+
+**New Files:**
+- `main.py` - FastAPI application
+- `models.py` - Pydantic data models
+- `plans/step-1-foundation.md` through `step-6-final.md` - Learning documentation
+
+**Modified Files:**
+- `requirements.txt` - Add FastAPI dependencies
+- `templates/*.html` - Update url_for syntax
+- `test_app.py` - Convert to FastAPI TestClient
+
+**Untouched Files:**
+- `app.py` - Keep original Flask app for comparison
+- `static/css/main.css` - No changes needed
 
 ---
 
