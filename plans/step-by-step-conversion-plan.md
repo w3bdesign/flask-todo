@@ -165,7 +165,90 @@ Update Jinja2 templates for FastAPI compatibility:
 
 ---
 
-## Phase 5: Final Testing & Cleanup
+## Phase 5: Convert Tests to FastAPI
+
+### What We'll Do
+Convert the existing Flask tests to FastAPI's TestClient:
+1. Update test imports and setup
+2. Add tests for API endpoints
+3. Add tests for form submissions
+4. Document testing approach
+
+### Files to Modify
+- `test_app.py` (MODIFY - convert to FastAPI TestClient)
+- `plans/step-5-testing.md` (NEW)
+
+### Flask Test (Current)
+```python
+import unittest
+from app import app, todos
+
+class AppTestCase(unittest.TestCase):
+    def setUp(self):
+        app.config["TESTING"] = True
+        self.app = app.test_client()
+
+    def test_create_todo(self):
+        response = self.app.post(
+            "/create",
+            data=dict(title="Test Todo", description="This is a test todo"),
+            follow_redirects=True,
+        )
+        self.assertEqual(response.status_code, 200)
+```
+
+### FastAPI Test (Converted)
+```python
+import pytest
+from fastapi.testclient import TestClient
+from main import app, todos
+
+@pytest.fixture
+def client():
+    todos.clear()  # Reset state before each test
+    return TestClient(app)
+
+def test_create_todo(client):
+    response = client.post(
+        "/create",
+        data={"title": "Test Todo", "description": "This is a test todo"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+def test_get_todos_api(client):
+    # First create a todo
+    client.post("/create", data={"title": "Test", "description": "Test"})
+    
+    # Then fetch via API
+    response = client.get("/todos")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+def test_delete_todo(client):
+    client.post("/create", data={"title": "Test", "description": "Test"})
+    response = client.get("/delete/1", follow_redirects=True)
+    assert response.status_code == 200
+```
+
+### Verification Steps
+```bash
+# Run tests with pytest
+pytest test_app.py -v
+
+# Expected output: All tests pass
+```
+
+### Learning Points
+- pytest vs unittest
+- FastAPI TestClient usage
+- Testing forms with `data=` parameter
+- Testing API endpoints with JSON
+- Test fixtures for state management
+
+---
+
+## Phase 6: Final Testing & Cleanup
 
 ### What We'll Do
 1. Complete end-to-end testing
