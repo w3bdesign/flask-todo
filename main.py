@@ -128,22 +128,14 @@ async def index(request: Request):
     )
 
 
-@app.get("/create", response_class=HTMLResponse)
-async def create_form(request: Request):
-    """Show the create todo form."""
-    return templates.TemplateResponse(
-        request,
-        "create.html"
-    )
-
-
-@app.post("/create")
+@app.post("/", response_class=HTMLResponse)
 async def create_todo(
+    request: Request,
     title: str = Form(...),
     description: str = Form("")
 ):
     """
-    Handle create form submission.
+    Handle inline create form submission from homepage.
     
     Creates a new Todo using Pydantic model for validation.
     """
