@@ -122,8 +122,9 @@ async def index(request: Request):
     # Convert Pydantic models to dicts for Jinja2 template
     todos_dict = [todo.model_dump() for todo in todos]
     return templates.TemplateResponse(
+        request,
         "index.html",
-        {"request": request, "todos": todos_dict}
+        {"todos": todos_dict}
     )
 
 
