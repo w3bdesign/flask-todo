@@ -189,10 +189,12 @@ async def edit_todo(
         raise HTTPException(status_code=404, detail="Todo not found")
     
     # Create updated todo with Pydantic validation
+    # Keep the completed status from the original todo
     updated_todo = Todo(
         id=todo_id,
         title=title,
-        description=description
+        description=description,
+        completed=old_todo.completed  # Preserve completed status
     )
     
     # Replace old with new
@@ -210,4 +212,41 @@ async def delete_todo(todo_id: int):
         raise HTTPException(status_code=404, detail="Todo not found")
     
     todos.remove(todo)
+    return RedirectResponse(url="/", status_code=303)
+
+
+# =============================================================================
+# Phase 7: Toggle Completed Status (New Feature!)
+# =============================================================================
+
+@app.get("/toggle/{todo_id}")
+async def toggle_completed(todo_id: int):
+    """
+    Toggle the completed status of a todo.
+    
+    This is a NEW feature not in the original Flask app!
+    It demonstrates how easy it is to add features in FastAPI.
+    
+    How it works:
+    1. Find the todo by ID
+    2. Create a new todo with completed = not completed
+    3. Replace the old todo with the new one
+    4. Redirect back to homepage
+    """
+    todo = find_todo_by_id(todo_id)
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    
+    # Create updated todo with toggled completed status
+    updated_todo = Todo(
+        id=todo.id,
+        title=todo.title,
+        description=todo.description,
+        completed=not todo.completed  # Toggle: True becomes False, False becomes True
+    )
+    
+    # Replace old with new
+    index = todos.index(todo)
+    todos[index] = updated_todo
+    
     return RedirectResponse(url="/", status_code=303)
