@@ -74,15 +74,16 @@
           
           <!-- Actions -->
           <div class="flex items-center gap-1">
-            <a
-              href="/edit/{{ todo.id }}"
+            <button
+              type="button"
+              onclick="openEditModal({{ todo.id }}, '{{ todo.title | e }}', '{{ todo.description | e }}')"
               class="p-1.5 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
               title="Edit"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
               </svg>
-            </a>
+            </button>
             <a
               href="/delete/{{ todo.id }}"
               class="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-100"
@@ -114,5 +115,87 @@
       </div>
       {% endif %}
     </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 z-50">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-black bg-opacity-50" onclick="closeEditModal()"></div>
+      
+      <!-- Modal Content -->
+      <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Edit Task</h2>
+            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <form id="editForm" method="post" action="">
+            <div class="p-4 space-y-4">
+              <div>
+                <label for="editTitle" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  id="editTitle"
+                  name="title"
+                  required
+                  class="w-full border border-gray-300 rounded-md py-2.5 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label for="editDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  id="editDescription"
+                  name="description"
+                  rows="3"
+                  placeholder="Add a description..."
+                  class="w-full border border-gray-300 rounded-md py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                ></textarea>
+              </div>
+            </div>
+            
+            <div class="flex gap-3 p-4 border-t border-gray-200">
+              <button
+                type="submit"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-md"
+              >
+                Save Changes
+              </button>
+              <button
+                type="button"
+                onclick="closeEditModal()"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openEditModal(id, title, description) {
+        document.getElementById('editForm').action = '/edit/' + id;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeEditModal();
+        }
+      });
+    </script>
   </body>
 </html>
