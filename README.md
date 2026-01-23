@@ -69,7 +69,3 @@ flask-todo/
 - **Backend**: FastAPI with Pydantic for data validation
 - **Frontend**: Jinja2 templates with Tailwind CSS (CDN)
 - **Server**: Uvicorn ASGI server
-
-## Credits
-
-This app was created by Daniel Fjeldstad (w3bdesign).
