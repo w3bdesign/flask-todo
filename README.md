@@ -1,51 +1,74 @@
-# Flask Todo App
+# FastAPI Todo App
 
-A simple Flask app that allows you to create, read, update, and delete todo items. This app uses Flask for the backend, and HTML templates for the frontend.
+A modern Todo application built with FastAPI and Tailwind CSS. Create, read, update, delete, and toggle completion status of your tasks with a clean, responsive interface.
+
+![Todo App Screenshot](screenshots/todo-app.png)
+
+## Features
+
+- ✅ Add new tasks with optional descriptions
+- ✅ Mark tasks as complete/incomplete with one click
+- ✅ Edit tasks via modal dialog
+- ✅ Delete tasks with confirmation
+- ✅ Clean, minimal UI with Tailwind CSS
+- ✅ Automatic API documentation (Swagger/ReDoc)
 
 ## Getting Started
 
-1.  Clone the repository.
-2.  Install the required packages with `pip install -r requirements.txt`.
-3.  Run the app with `python app.py`.
+1. Clone the repository
+2. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the app:
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
+4. Open http://localhost:8000 in your browser
+
+## API Documentation
+
+FastAPI provides automatic interactive API documentation:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
 ## API Endpoints
 
-The following API endpoints are available:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Web interface - displays all todos |
+| `POST` | `/` | Create a new todo |
+| `GET` | `/todos` | Get all todos (JSON) |
+| `GET` | `/todos/{id}` | Get a specific todo (JSON) |
+| `GET` | `/toggle/{id}` | Toggle completion status |
+| `GET` | `/edit/{id}` | Edit form (GET) |
+| `POST` | `/edit/{id}` | Update a todo |
+| `GET` | `/delete/{id}` | Delete a todo |
+| `GET` | `/health` | Health check endpoint |
 
-### `GET /todos`
+## Project Structure
 
-Returns a list of all todos.
+```
+flask-todo/
+├── main.py              # FastAPI application
+├── models.py            # Pydantic models
+├── app.py               # Legacy Flask application
+├── templates/
+│   ├── index.html       # Main page with todo list and edit modal
+│   └── edit.html        # Standalone edit page (legacy)
+├── static/
+│   └── css/
+│       └── main.css     # Compiled Tailwind CSS
+├── requirements.txt     # Python dependencies
+└── README.md
+```
 
-### `GET /todos/<int:id>`
+## Tech Stack
 
-Returns the todo with the specified ID.
-
-### `POST /create`
-
-Creates a new todo item.
-
-### `POST /edit/<int:id>`
-
-Updates the todo item with the specified ID.
-
-### `DELETE /delete/<int:id>`
-
-Deletes the todo item with the specified ID.
-
-## Code Overview
-
-The app consists of the following files:
-
-*   `app.py`: This file contains the main Flask application.
-*   `templates/index.html`: This file contains the HTML template for the main page of the app.
-*   `templates/create.html`: This file contains the HTML template for the create todo page.
-*   `templates/edit.html`: This file contains the HTML template for the edit todo page.
-*   `requirements.txt`: This file contains the required packages for the app.
-*   `README.md`: This file contains information about the app.
-
-## Usage
-
-To use the app, simply navigate to `http://localhost:5000/` in your web browser. From there, you can create new todos, edit existing ones, and delete them.
+- **Backend**: FastAPI with Pydantic for data validation
+- **Frontend**: Jinja2 templates with Tailwind CSS (CDN)
+- **Server**: Uvicorn ASGI server
 
 ## Credits
 

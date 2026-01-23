@@ -1,46 +1,201 @@
 <!DOCTYPE html>
-<html class="h-full">
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
-    <link
-      href="{{url_for('static',filename='css/main.css')}}"
-      rel="stylesheet"
-    />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body class="flex flex-col h-full justify-center items-center bg-gray-100">
-    <section class="text-gray-600 body-font flex-grow">
-      <div class="container mx-auto px-5 py-10 sm:py-24">
-        <h1 class="text-3xl font-bold mb-10 text-center">Todo List</h1>
+  <body class="min-h-screen bg-gray-50">
+    <div class="max-w-2xl mx-auto px-4 py-12">
+      <!-- Header -->
+      <header class="mb-8">
+        <h1 class="text-2xl font-semibold text-gray-900">Todo List</h1>
+        <p class="text-gray-500 text-sm mt-1">Keep track of your tasks</p>
+      </header>
 
-        <ul class="space-y-5">
-          {% for todo in todos %}
-          <li class="border-b pb-2">
-            <h3 class="text-lg font-bold">{{ todo.title }}</h3>
-            <p class="text-sm">{{ todo.description }}</p>
-            <div class="mt-2">
-              <a
-                href="/edit/{{ todo.id }}"
-                class="text-blue-500 mr-2 hover:text-blue-600"
-                >Edit</a
-              >
-              <a
-                href="/delete/{{ todo.id }}"
-                class="text-red-500 hover:text-red-600"
-                >Delete</a
-              >
+      <!-- Add Todo Form -->
+      <form method="post" class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div class="flex flex-col gap-3">
+          <input
+            type="text"
+            name="title"
+            placeholder="What needs to be done?"
+            required
+            class="w-full border border-gray-300 rounded-md py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div class="flex gap-3">
+            <input
+              type="text"
+              name="description"
+              placeholder="Description (optional)"
+              class="flex-1 border border-gray-300 rounded-md py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-md"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Todo List -->
+      {% if todos %}
+      <div class="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
+        {% for todo in todos %}
+        <div class="p-4 flex items-start gap-3 hover:bg-gray-50">
+          <!-- Checkbox -->
+          <a href="/toggle/{{ todo.id }}" class="mt-0.5 flex-shrink-0">
+            {% if todo.completed %}
+            <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center cursor-pointer">
+              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+              </svg>
             </div>
-          </li>
-          {% endfor %}
-        </ul>
-
-        <a
-          href="/create"
-          class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Create New Todo
-        </a>
+            {% else %}
+            <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-gray-400"></div>
+            {% endif %}
+          </a>
+          
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <p class="text-gray-900 {% if todo.completed %}line-through text-gray-400{% endif %}">
+              {{ todo.title }}
+            </p>
+            {% if todo.description %}
+            <p class="text-sm text-gray-500 mt-0.5 {% if todo.completed %}line-through{% endif %}">
+              {{ todo.description }}
+            </p>
+            {% endif %}
+          </div>
+          
+          <!-- Actions -->
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              onclick="openEditModal({{ todo.id }}, '{{ todo.title | e }}', '{{ todo.description | e }}')"
+              class="p-1.5 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
+              title="Edit"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+              </svg>
+            </button>
+            <a
+              href="/delete/{{ todo.id }}"
+              class="p-1.5 text-gray-400 hover:text-red-500 rounded hover:bg-gray-100"
+              title="Delete"
+              onclick="return confirm('Delete this task?')"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
       </div>
-    </section>
+      
+      <p class="text-center text-sm text-gray-400 mt-4">
+        {{ todos|length }} task{% if todos|length != 1 %}s{% endif %}
+      </p>
+      {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <div class="text-gray-300 mb-3">
+          <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <p class="text-gray-500">No tasks yet</p>
+        <p class="text-gray-400 text-sm">Add one above to get started</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="hidden fixed inset-0 z-50">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-black bg-opacity-50" onclick="closeEditModal()"></div>
+      
+      <!-- Modal Content -->
+      <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Edit Task</h2>
+            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <form id="editForm" method="post" action="">
+            <div class="p-4 space-y-4">
+              <div>
+                <label for="editTitle" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  id="editTitle"
+                  name="title"
+                  required
+                  class="w-full border border-gray-300 rounded-md py-2.5 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label for="editDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  id="editDescription"
+                  name="description"
+                  rows="3"
+                  placeholder="Add a description..."
+                  class="w-full border border-gray-300 rounded-md py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                ></textarea>
+              </div>
+            </div>
+            
+            <div class="flex gap-3 p-4 border-t border-gray-200">
+              <button
+                type="submit"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-md"
+              >
+                Save Changes
+              </button>
+              <button
+                type="button"
+                onclick="closeEditModal()"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openEditModal(id, title, description) {
+        document.getElementById('editForm').action = '/edit/' + id;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeEditModal();
+        }
+      });
+    </script>
   </body>
 </html>

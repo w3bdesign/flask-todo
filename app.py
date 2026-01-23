@@ -6,33 +6,37 @@ app = Flask(__name__)
 todos = []
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    # Retrieve the todos from the /todos API endpoint
-    response = requests.get("http://localhost:5000/todos")
-    todos = response.json()["todos"]
+    if request.method == "POST":
+        title = request.form["title"]
+        description = request.form.get("description", "")
+        todo = {
+            "id": generate_id(),
+            "title": title,
+            "description": description,
+            "completed": False
+        }
+        create_todo(todo)
+        return redirect(url_for("index"))
     return render_template("index.html", todos=todos)
 
 
-@app.route("/create", methods=["GET", "POST"])
-def create():
-    if request.method == "POST":
-        title = request.form["title"]
-        description = request.form["description"]
-        todo = {"id": generate_id(), "title": title, "description": description}
-        create_todo(todo)
-        return redirect(url_for("index"))
-    return render_template("create.html")
+@app.route("/toggle/<int:id>")
+def toggle(id):
+    toggle_todo_by_id(id)
+    return redirect(url_for("index"))
 
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id):
-    todo = get_todo_by_id(id)
+    todo = find_todo_by_id(id)
+    if not todo:
+        return redirect(url_for("index"))
     if request.method == "POST":
         title = request.form["title"]
         description = request.form["description"]
         update_todo_by_id(id, {"title": title, "description": description})
-        #return jsonify({"message": "Todo updated successfully."})
         return redirect(url_for("index"))
     return render_template("edit.html", todo=todo)
 
@@ -40,7 +44,6 @@ def edit(id):
 @app.route("/delete/<int:id>")
 def delete(id):
     delete_todo_by_id(id)
-    #return jsonify({"message": "Todo deleted successfully."})
     return redirect(url_for("index"))
 
 
@@ -51,11 +54,7 @@ def get_all_todos():
 
 @app.route("/todos/<int:id>")
 def get_todo_by_id(id):
-    todo = None
-    for t in todos:
-        if t["id"] == id:
-            todo = t
-            break
+    todo = find_todo_by_id(id)
     if todo:
         return jsonify({"todo": todo})
     else:
@@ -70,6 +69,21 @@ def generate_id():
 
 def create_todo(todo):
     todos.append(todo)
+
+
+def find_todo_by_id(id):
+    for t in todos:
+        if t["id"] == id:
+            return t
+    return None
+
+
+def toggle_todo_by_id(id):
+    for i in range(len(todos)):
+        if todos[i]["id"] == id:
+            todos[i]["completed"] = not todos[i].get("completed", False)
+            return
+    raise Exception("Todo not found.")
 
 
 def update_todo_by_id(id, new_todo):

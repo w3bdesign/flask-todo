@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.1.18"
   },
   "scripts": {
     "create-css": "npx tailwindcss -i ./static/src/input.css -o ./static/css/main.css"
