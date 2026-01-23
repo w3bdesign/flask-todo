@@ -2,6 +2,8 @@
 
 A modern Todo application built with FastAPI and Tailwind CSS. Create, read, update, delete, and toggle completion status of your tasks with a clean, responsive interface.
 
+![Todo App Screenshot](screenshots/todo-app.png)
+
 ## Features
 
 - ✅ Add new tasks with optional descriptions
