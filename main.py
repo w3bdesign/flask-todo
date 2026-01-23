@@ -18,7 +18,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 # Import our Pydantic models
-from models import Todo, TodoCreate, TodoUpdate
+from models import Todo
 
 # =============================================================================
 # Application Setup
@@ -64,6 +64,7 @@ def find_todo_by_id(todo_id: int) -> Todo | None:
 # Phase 2: API Routes (JSON endpoints)
 # =============================================================================
 
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint to verify the app is running."""
@@ -74,12 +75,12 @@ async def health_check():
 async def get_all_todos():
     """
     Get all todos.
-    
+
     Flask equivalent:
         @app.route("/todos")
         def get_all_todos():
             return jsonify({"todos": todos})
-    
+
     FastAPI with Pydantic:
         - response_model=list[Todo] ensures proper JSON serialization
         - Automatic documentation of response schema
@@ -92,12 +93,12 @@ async def get_all_todos():
 async def get_todo(todo_id: int):
     """
     Get a single todo by ID.
-    
+
     Flask equivalent:
         @app.route("/todos/<int:id>")
         def get_todo_by_id(id):
             ...
-    
+
     FastAPI with Pydantic:
         - response_model=Todo ensures proper serialization
         - Path parameter validation with type hint
@@ -112,39 +113,30 @@ async def get_todo(todo_id: int):
 # Phase 3: Web Interface Routes (HTML pages)
 # =============================================================================
 
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """
     Homepage - displays all todos.
-    
+
     We convert Pydantic models to dicts for template rendering.
     """
     # Convert Pydantic models to dicts for Jinja2 template
     todos_dict = [todo.model_dump() for todo in todos]
-    return templates.TemplateResponse(
-        request,
-        "index.html",
-        {"todos": todos_dict}
-    )
+    return templates.TemplateResponse(request, "index.html", {"todos": todos_dict})
 
 
 @app.post("/", response_class=HTMLResponse)
 async def create_todo(
-    request: Request,
-    title: str = Form(...),
-    description: str = Form("")
+    request: Request, title: str = Form(...), description: str = Form("")
 ):
     """
     Handle inline create form submission from homepage.
-    
+
     Creates a new Todo using Pydantic model for validation.
     """
     # Create Pydantic model instance (validates the data!)
-    todo = Todo(
-        id=generate_id(),
-        title=title,
-        description=description
-    )
+    todo = Todo(id=generate_id(), title=title, description=description)
     todos.append(todo)
     return RedirectResponse(url="/", status_code=303)
 
@@ -155,44 +147,36 @@ async def edit_form(request: Request, todo_id: int):
     todo = find_todo_by_id(todo_id)
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    
+
     # Convert to dict for template
-    return templates.TemplateResponse(
-        request,
-        "edit.html",
-        {"todo": todo.model_dump()}
-    )
+    return templates.TemplateResponse(request, "edit.html", {"todo": todo.model_dump()})
 
 
 @app.post("/edit/{todo_id}")
-async def edit_todo(
-    todo_id: int,
-    title: str = Form(...),
-    description: str = Form("")
-):
+async def edit_todo(todo_id: int, title: str = Form(...), description: str = Form("")):
     """
     Handle edit form submission.
-    
+
     Updates the todo using Pydantic model.
     """
     # Find existing todo
     old_todo = find_todo_by_id(todo_id)
     if not old_todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    
+
     # Create updated todo with Pydantic validation
     # Keep the completed status from the original todo
     updated_todo = Todo(
         id=todo_id,
         title=title,
         description=description,
-        completed=old_todo.completed  # Preserve completed status
+        completed=old_todo.completed,  # Preserve completed status
     )
-    
+
     # Replace old with new
     index = todos.index(old_todo)
     todos[index] = updated_todo
-    
+
     return RedirectResponse(url="/", status_code=303)
 
 
@@ -202,7 +186,7 @@ async def delete_todo(todo_id: int):
     todo = find_todo_by_id(todo_id)
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    
+
     todos.remove(todo)
     return RedirectResponse(url="/", status_code=303)
 
@@ -211,14 +195,15 @@ async def delete_todo(todo_id: int):
 # Phase 7: Toggle Completed Status (New Feature!)
 # =============================================================================
 
+
 @app.get("/toggle/{todo_id}")
 async def toggle_completed(todo_id: int):
     """
     Toggle the completed status of a todo.
-    
+
     This is a NEW feature not in the original Flask app!
     It demonstrates how easy it is to add features in FastAPI.
-    
+
     How it works:
     1. Find the todo by ID
     2. Create a new todo with completed = not completed
@@ -228,17 +213,17 @@ async def toggle_completed(todo_id: int):
     todo = find_todo_by_id(todo_id)
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    
+
     # Create updated todo with toggled completed status
     updated_todo = Todo(
         id=todo.id,
         title=todo.title,
         description=todo.description,
-        completed=not todo.completed  # Toggle: True becomes False, False becomes True
+        completed=not todo.completed,  # Toggle: True becomes False, False becomes True
     )
-    
+
     # Replace old with new
     index = todos.index(todo)
     todos[index] = updated_todo
-    
+
     return RedirectResponse(url="/", status_code=303)
